@@ -5,7 +5,7 @@ export default function Home() {
     <section className="hero wrap" id="home">
       <Editable as="h1" k="hero_title" def="Thumbnails people can’t scroll past." />
       <Editable as="p" k="hero_text" def="Custom YouTube thumbnails designed by the owner of FLEET CREATES." />
-      <a className="btn red" href="/auth?mode=up">Start your order</a>
+      <a className="btn red" href="/orders">Start your order</a>
     </section>
     <section className="wrap" id="portfolio"><h2>Portfolio</h2>
       <div className="grid">{[1, 2, 3].map((i) => <img key={i} src={`/portfolio/${i}.jpg`} alt={`Thumbnail ${i}`} />)}</div></section>
