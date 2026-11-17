@@ -9,6 +9,11 @@ function withTimeout(promise, ms) {
   ]);
 }
 
+function nextUrl() {
+  const n = new URLSearchParams(location.search).get('next');
+  return n && n.startsWith('/') && !n.startsWith('//') ? n : '/';
+}
+
 export default function Auth() {
   const [mode, setMode] = useState('in');
   const [u, setU] = useState('');
@@ -18,6 +23,9 @@ export default function Auth() {
 
   useEffect(() => {
     if (new URLSearchParams(location.search).get('mode') === 'up') setMode('up');
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) window.location.href = nextUrl();
+    }).catch(() => {});
   }, []);
 
   async function submit(e) {
@@ -43,7 +51,7 @@ export default function Auth() {
         );
         return;
       }
-      window.location.href = '/';
+      window.location.href = nextUrl();
     } catch (ex) {
       console.error('Auth failed:', ex);
       setErr(
