@@ -1,21 +1,44 @@
 'use client';
-import Link from 'next/link';
 import { useApp } from './Providers';
 import { supabase } from '../lib/supabase';
+
 export default function Nav() {
-  const { profile, canEdit, editing, setEditing } = useApp();
+  const { user, ready, isOwner, editing, setEditing } = useApp();
+  const name = user?.user_metadata?.username || user?.email?.split('@')[0] || '';
+
+  async function signOut() {
+    try { await supabase.auth.signOut(); } catch (e) {}
+    window.location.href = '/';
+  }
+
   return (
     <nav>
-      <Link href="/" className="logo">FLEET <b>CREATES</b></Link>
+      <a className="logo" href="/">FLEET <b>CREATES</b></a>
       <div className="links">
-        <Link href="/">Home</Link><Link href="/#portfolio">Portfolio</Link><Link href="/#services">Services</Link>
-        <Link href="/#about">About</Link><Link href="/#contact">Contact</Link>
+        <a href="/">Home</a>
+        <a href="/#portfolio">Portfolio</a>
+        <a href="/#services">Services</a>
+        <a href="/#about">About</a>
+        <a href="/#contact">Contact</a>
       </div>
       <div className="right">
-        {canEdit && <button className={editing ? 'btn red' : 'btn'} onClick={() => setEditing(!editing)}>{editing ? 'Done editing' : 'Edit site'}</button>}
-        {profile ? (<><span className="who">{profile.username} · {profile.role}</span>
-          <button className="btn" onClick={() => supabase.auth.signOut()}>Sign out</button></>) : (<>
-          <Link className="btn" href="/auth">Sign In</Link><Link className="btn red" href="/auth?mode=up">Get Started</Link></>)}
+        {!ready ? null : user ? (
+          <>
+            <span className="who">{name}</span>
+            {isOwner && (
+              <button className={editing ? 'btn red' : 'btn'} onClick={() => setEditing(!editing)}>
+                {editing ? 'Done editing' : 'Edit site'}
+              </button>
+            )}
+            <a className="btn" href={isOwner ? '/admin' : '/orders'}>{isOwner ? 'Inbox' : 'My orders'}</a>
+            <button className="btn" onClick={signOut}>Sign out</button>
+          </>
+        ) : (
+          <>
+            <a className="btn" href="/auth">Sign In</a>
+            <a className="btn red" href="/auth?mode=up">Get Started</a>
+          </>
+        )}
       </div>
     </nav>
   );
